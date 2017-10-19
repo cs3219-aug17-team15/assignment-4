@@ -39,4 +39,12 @@ public class Author {
   public int hashCode() {
     return Objects.hash(getIds(), getName());
   }
+
+  @Override
+  public String toString() {
+    if (name != null) {
+      return this.name;
+    }
+    return super.toString();
+  }
 }
