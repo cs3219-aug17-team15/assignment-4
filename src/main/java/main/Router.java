@@ -1,34 +1,24 @@
 package main;
 
-import static spark.Spark.*;
-import java.nio.file.Paths;
+import static spark.Spark.get;
+import static spark.Spark.path;
 
-import controllers.AuthorController;
-import parser.Parser;
-import storage.PaperStore;
+import controllers.ViewController;
 
 public class Router {
-  // replace resource.json with the file name of the dataset
-  private static final String RES_PATH = Paths.get(System.getProperty("user.dir"), "assets/resource.json").toString();
   private static final String ROUTER_INIT = "Starting up router...";
   private static final String ROUTER_STARTED = "Router initialised and ready to serve.";
-  public static PaperStore paperStore;
-
-  public Router() {
-    paperStore = new PaperStore();
-    Parser parser = new Parser(paperStore, RES_PATH);
-    parser.parse();
-    paperStore.update();
-  }
 
   public void initAndServe() {
     System.out.println(ROUTER_INIT);
 
     // setup endpoints
-    path("/api", () -> {
-      path("/authors", () -> {
-        get("/", AuthorController.test);
-      });
+    path("/tasks", () -> {
+      get("/1", ViewController.task1);
+      get("/2", ViewController.task2);
+      get("/3", ViewController.task3);
+      get("/4", ViewController.task4);
+      get("/5", ViewController.task5);
     });
 
     System.out.println(ROUTER_STARTED);
