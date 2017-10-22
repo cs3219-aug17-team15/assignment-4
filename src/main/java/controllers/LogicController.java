@@ -1,5 +1,8 @@
 package controllers;
 
+import java.io.BufferedWriter;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.nio.file.Paths;
 import java.util.Collections;
 import java.util.Comparator;
@@ -39,7 +42,7 @@ public class LogicController {
   }
   
   public String task1() {
-	  String result ="Task1:\n" ;
+	  String result ="id,value\n" ;
 	  ConcurrentHashMap<String, List<Paper>> listVenue = paperStore.getVenueToPapers();
 	  List<Paper> list = listVenue.get("arXiv");
 	  ConcurrentHashMap<String, Integer> listAuthor = new ConcurrentHashMap<String, Integer>();
@@ -63,10 +66,22 @@ public class LogicController {
 	  for (String s : max){
 		  result += s +","+listAuthor.get(s)+"\n";
 	  }
-	  return result;
+	  final String PATH = Paths.get(System.getProperty("user.dir"), "src/main/task1.csv").toString();
+	  FileWriter fw;
+	  try {
+			fw = new FileWriter(PATH);
+			BufferedWriter bw = new BufferedWriter(fw);
+			bw.write(result);
+			bw.close();
+			fw.close();
+			  
+		} catch (IOException e) {
+			System.err.println(e.getMessage());
+		}
+	return result;
   }
   public String task2() {
-	  String result ="Task2:\n" ;
+	  String result ="id,value\n" ;
 	  ConcurrentHashMap<String, List<Paper>> listVenue = paperStore.getVenueToPapers();
 	  List<Paper> list = listVenue.get("arXiv");
 	  ConcurrentHashMap<String, Integer> listCitation = new ConcurrentHashMap<String, Integer>();
@@ -90,10 +105,22 @@ public class LogicController {
 	  for (String s : max){
 		  result += s +","+listCitation.get(s)+"\n";
 	  }
+	  final String PATH = Paths.get(System.getProperty("user.dir"), "src/main/task2.csv").toString();
+	  FileWriter fw;
+	  try {
+			fw = new FileWriter(PATH);
+			BufferedWriter bw = new BufferedWriter(fw);
+			bw.write(result);
+			bw.close();
+			fw.close();
+			  
+		} catch (IOException e) {
+			System.err.println(e.getMessage());
+		}
 	  return result;
   }
   public String task3() {
-	  String result ="Task3:\n" ;
+	  String result ="Year,Amount\n" ;
 	  ConcurrentHashMap<String, List<Paper>> listVenue = paperStore.getVenueToPapers();
 	  List<Paper> list = listVenue.get("arXiv");
 	  ConcurrentHashMap<Integer, Integer> listYear = new ConcurrentHashMap<Integer, Integer>();
@@ -119,40 +146,71 @@ public class LogicController {
 			  result += i+","+count;
 		  }
 	  }
+	  final String PATH = Paths.get(System.getProperty("user.dir"), "src/main/task3.csv").toString();
+	  FileWriter fw;
+	  try {
+			fw = new FileWriter(PATH);
+			BufferedWriter bw = new BufferedWriter(fw);
+			bw.write(result);
+			bw.close();
+			fw.close();
+			  
+		} catch (IOException e) {
+			System.err.println(e.getMessage());
+		}
 	  return result;
   }
   public String task4() {
 	  String result ="Task4:\n" ;
-	  String listVertex = "";
-	  String listEdge = "";
+	  String listVertex = "{\n\"nodes\": [\n";
+	  String listEdge = "\"links\": [\n";
 	  String title = "Low-density parity check codes over GF(q)";
 	  ConcurrentHashMap<String, List<Paper>> listInCitation = paperStore.getInCitations();
 	  ConcurrentHashMap<String, List<Paper>> listOutCitation = paperStore.getOutCitations();
 	  List<Paper> inList = listInCitation.get(title);
 	  List<Paper> outList = listOutCitation.get(title);
-	  listVertex += title+","+"0";
+	  Boolean first = true;
+	  listVertex += "{\"id\": \""+title+"\", \"group\": "+0+"}";
 	  for (Paper p : inList){
-		  listVertex += p.getTitle()+","+"1";
-		  listEdge += p.getTitle()+"-"+title;
+		  listVertex += ",\n{\"id\": \""+p.getTitle()+"\", \"group\": "+1+"}";
+		  if(first){
+			  listEdge += "{\"source\": \""+ p.getTitle()+"\", \"target\": \""+title+"\", \"value\": 1}";
+			  first = false;
+		  } else {
+			  listEdge += ",\n{\"source\": \""+ p.getTitle()+"\", \"target\": \""+title+"\", \"value\": 1}";
+		  }
 		  List<Paper> list = listInCitation.get(p.getTitle());
 		  for (Paper t : list){
-			  listVertex += t.getTitle()+","+"3";
-			  listEdge += t.getTitle()+"-"+p.getTitle();
+			  listVertex += ",\n{\"id\": \""+t.getTitle()+"\", \"group\": "+3+"}";
+			  listEdge += ",\n{\"source\": \""+ t.getTitle()+"\", \"target\": \""+p.getTitle()+"\", \"value\": 1}";
 		  }
 	  }
 	  for (Paper p : outList){
-		  listVertex += p.getTitle()+","+"2";
-		  listEdge += title+"-"+p.getTitle();
+		  listVertex += ",\n{\"id\": \""+p.getTitle()+"\", \"group\": "+2+"}";
+		  listEdge += ",\n{\"source\": \""+title+"\", \"target\": \""+p.getTitle()+"\", \"value\": 1}";
 		  List<Paper> list = listOutCitation.get(p.getTitle());
 		  for (Paper t : list){
-			  listVertex += t.getTitle()+","+"4";
-			  listEdge += p.getTitle()+"-"+t.getTitle();
+			  listVertex += ",\n{\"id\": \""+t.getTitle()+"\", \"group\": "+4+"}";
+			  listEdge += ",\n{\"source\": \""+p.getTitle()+"\", \"target\": \""+t.getTitle()+"\", \"value\": 1}";
 		  }
 	  }
-	  return result = listVertex + listEdge;
+	  result = listVertex+"\n],\n" + listEdge+"\n]\n}\n";
+	  final String PATH = Paths.get(System.getProperty("user.dir"), "src/main/task4.json").toString();
+	  FileWriter fw;
+	  try {
+			fw = new FileWriter(PATH);
+			BufferedWriter bw = new BufferedWriter(fw);
+			bw.write(result);
+			bw.close();
+			fw.close();
+			  
+		} catch (IOException e) {
+			System.err.println(e.getMessage());
+		}
+	  return result;
   }
   public String task5() {
-	  String result ="Task5:\n" ;
+	  String result ="id,value\n" ;
 	  ConcurrentHashMap<String, List<Paper>> listVenue = paperStore.getVenueToPapers();
 	  List<Paper> list = listVenue.get("arXiv");
 	  ConcurrentHashMap<String, Integer> listKeyPhrase = new ConcurrentHashMap<String, Integer>();
@@ -176,6 +234,18 @@ public class LogicController {
 	  for (String s : max){
 		  result += s +","+listKeyPhrase.get(s)+"\n";
 	  }
+	  final String PATH = Paths.get(System.getProperty("user.dir"), "src/main/task5.csv").toString();
+	  FileWriter fw;
+	  try {
+			fw = new FileWriter(PATH);
+			BufferedWriter bw = new BufferedWriter(fw);
+			bw.write(result);
+			bw.close();
+			fw.close();
+			  
+		} catch (IOException e) {
+			System.err.println(e.getMessage());
+		}
 	  return result;
   }
 }
