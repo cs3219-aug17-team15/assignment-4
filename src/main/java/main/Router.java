@@ -1,8 +1,8 @@
 package main;
 
-import static spark.Spark.get;
-import static spark.Spark.path;
+import static spark.Spark.*;
 
+import controllers.LogicController;
 import controllers.ViewController;
 
 public class Router {
@@ -11,6 +11,15 @@ public class Router {
 
   public void initAndServe() {
     System.out.println(ROUTER_INIT);
+    // for local dev
+    String projectDir = System.getProperty("user.dir");
+    String staticDir = "/src/main/resources/velocity";
+    staticFiles.externalLocation(projectDir + staticDir);
+
+    // for deployment
+    // staticFiles.location("/velocity");
+
+    LogicController.getInstance();
 
     // setup endpoints
     path("/tasks", () -> {
@@ -19,6 +28,11 @@ public class Router {
       get("/3", ViewController.task3);
       get("/4", ViewController.task4);
       get("/5", ViewController.task5);
+    });
+
+    path("/api", () -> {
+      get("/task1", LogicController.task1JSON);
+      get("/task2", LogicController.task2JSON);
     });
 
     System.out.println(ROUTER_STARTED);
