@@ -70,7 +70,7 @@ public class LogicController {
 	  ConcurrentHashMap<String, List<Paper>> listVenue = paperStore.getVenueToPapers();
 	  List<Paper> list = listVenue.get("arXiv");
 	  ConcurrentHashMap<String, Integer> listCitation = new ConcurrentHashMap<String, Integer>();
-	  String max[] = new String[10];
+	  String max[] = new String[5];
 	  for (Paper p : list){
 		  List<String> citation = p.getInCitations();
 		  for (String s : citation) {
@@ -78,7 +78,7 @@ public class LogicController {
 			  int i = listCitation.get(s);
 			  i += 1;
 			  String temp = s;
-			  for(int j = 0; j < 10; j++){
+			  for(int j = 0; j < 5; j++){
 				  if(max[j] == null || listCitation.get(max[j]) < listCitation.get(temp)){
 					  String temp1 = max[j];
 					  max[j] = temp;
