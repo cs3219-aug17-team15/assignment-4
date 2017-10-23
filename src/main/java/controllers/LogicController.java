@@ -132,33 +132,23 @@ public class LogicController {
     return result = listVertex + listEdge;
   }
 
-  public String task5() {
-    String result = "Task5:\n";
+  public static Route task5JSON = (Request req, Response resp) -> {
     ConcurrentHashMap<String, List<Paper>> listVenue = paperStore.getVenueToPapers();
     List<Paper> list = listVenue.get("ArXiv");
     ConcurrentHashMap<String, Integer> listKeyPhrase = new ConcurrentHashMap<String, Integer>();
-    String max[] = new String[10];
     for (Paper p : list) {
-      List<String> phrase = p.getKeyPhrases();
-      for (String s : phrase) {
-        listKeyPhrase.putIfAbsent(s, 0);
-        int i = listKeyPhrase.get(s);
-        i += 1;
-        String temp = s;
-        for (int j = 0; j < 10; j++) {
-          if (max[j] == null || listKeyPhrase.get(max[j]) < listKeyPhrase.get(temp)) {
-            String temp1 = max[j];
-            max[j] = temp;
-            temp = temp1;
-          }
+      for (String s : p.getKeyPhrases()) {
+        if (listKeyPhrase.containsKey(s)) {
+          listKeyPhrase.put(s, listKeyPhrase.get(s) + 1);
+        } else {
+          listKeyPhrase.put(s, 1);
         }
       }
     }
-    for (String s : max) {
-      result += s + "," + listKeyPhrase.get(s) + "\n";
-    }
-    return result;
-  }
+    return gson.toJson(findGreatest(listKeyPhrase, 10).stream()
+        .map(entry -> new NameCount(entry.getKey(), entry.getValue()))
+        .collect(Collectors.toList()));
+  };
 
   protected static <K, V extends Comparable<? super V>> List<Entry<K, V>> findGreatest(
       Map<K, V> map, int n) {
@@ -185,6 +175,7 @@ public class LogicController {
     return result;
   }
 
+  @SuppressWarnings(value = {"unused"})
   private static class NameCount {
     private int count;
     private String name;
