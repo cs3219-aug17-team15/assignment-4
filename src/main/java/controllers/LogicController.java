@@ -1,5 +1,8 @@
 package controllers;
 
+import java.io.BufferedWriter;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -103,33 +106,59 @@ public class LogicController {
 
   public String task4() {
     String result = "Task4:\n";
-    String listVertex = "";
-    String listEdge = "";
+    String listVertex = "{\n\"nodes\": [\n";
+    String listEdge = "\"links\": [\n";
     String title = "Low-density parity check codes over GF(q)";
     ConcurrentHashMap<String, List<Paper>> listInCitation = paperStore.getInCitations();
     ConcurrentHashMap<String, List<Paper>> listOutCitation = paperStore.getOutCitations();
-    List<Paper> inList = listInCitation.get(title);
-    List<Paper> outList = listOutCitation.get(title);
-    listVertex += title + "," + "0";
+    ConcurrentHashMap<String, Paper> listPaper = paperStore.getTitleToPapers();
+    Paper base = listPaper.get(title);
+    List<Paper> inList = listInCitation.get(base.getId());
+    List<Paper> outList = listOutCitation.get(base.getId());
+    Boolean first = true;
+    listVertex += "{\"id\": \"" + title + "\", \"group\": " + 0 + "}";
     for (Paper p : inList) {
-      listVertex += p.getTitle() + "," + "1";
-      listEdge += p.getTitle() + "-" + title;
-      List<Paper> list = listInCitation.get(p.getTitle());
+      listVertex += ",\n{\"id\": \"" + p.getTitle() + "\", \"group\": " + 1 + "}";
+      if (first) {
+        listEdge +=
+            "{\"source\": \"" + p.getTitle() + "\", \"target\": \"" + title + "\", \"value\": 1}";
+        first = false;
+      } else {
+        listEdge += ",\n{\"source\": \"" + p.getTitle() + "\", \"target\": \"" + title
+            + "\", \"value\": 1}";
+      }
+      List<Paper> list = listInCitation.getOrDefault(p.getId(),new ArrayList<>());
       for (Paper t : list) {
-        listVertex += t.getTitle() + "," + "3";
-        listEdge += t.getTitle() + "-" + p.getTitle();
+        listVertex += ",\n{\"id\": \"" + t.getTitle() + "\", \"group\": " + 3 + "}";
+        listEdge += ",\n{\"source\": \"" + t.getTitle() + "\", \"target\": \"" + p.getTitle()
+            + "\", \"value\": 1}";
       }
     }
     for (Paper p : outList) {
-      listVertex += p.getTitle() + "," + "2";
-      listEdge += title + "-" + p.getTitle();
-      List<Paper> list = listOutCitation.get(p.getTitle());
+      listVertex += ",\n{\"id\": \"" + p.getTitle() + "\", \"group\": " + 2 + "}";
+      listEdge +=
+          ",\n{\"source\": \"" + title + "\", \"target\": \"" + p.getTitle() + "\", \"value\": 1}";
+      List<Paper> list = listOutCitation.getOrDefault(p.getId(),new ArrayList<>());
       for (Paper t : list) {
-        listVertex += t.getTitle() + "," + "4";
-        listEdge += p.getTitle() + "-" + t.getTitle();
+        listVertex += ",\n{\"id\": \"" + t.getTitle() + "\", \"group\": " + 4 + "}";
+        listEdge += ",\n{\"source\": \"" + p.getTitle() + "\", \"target\": \"" + t.getTitle()
+            + "\", \"value\": 1}";
       }
     }
-    return result = listVertex + listEdge;
+    result = listVertex + "\n],\n" + listEdge + "\n]\n}\n";
+    final String PATH = Paths.get(System.getProperty("user.dir"), "src/main/task4.json").toString();
+    FileWriter fw;
+    try {
+      fw = new FileWriter(PATH);
+      BufferedWriter bw = new BufferedWriter(fw);
+      bw.write(result);
+      bw.close();
+      fw.close();
+
+    } catch (IOException e) {
+      System.err.println(e.getMessage());
+    }
+    return result;
   }
 
   public static Route task5JSON = (Request req, Response resp) -> {

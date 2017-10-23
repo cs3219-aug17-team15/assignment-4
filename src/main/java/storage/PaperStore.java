@@ -13,6 +13,7 @@ public class PaperStore {
   private ConcurrentHashMap<String, Author> authorIdToAuthor = new ConcurrentHashMap<>(); // id -> author
 
   private ConcurrentHashMap<String, Paper> paperIdToPaper = new ConcurrentHashMap<>(); // id -> paper
+  private ConcurrentHashMap<String, Paper> paperTitleToPaper = new ConcurrentHashMap<>(); // title -> paper
 
   private ConcurrentHashMap<String, List<Author>> paperIdToAuthors = new ConcurrentHashMap<>(); // paper -> authors
 
@@ -25,6 +26,7 @@ public class PaperStore {
 
   public void addPaper(Paper paper) {
     this.paperIdToPaper.putIfAbsent(paper.getId(), paper);
+    this.paperTitleToPaper.putIfAbsent(paper.getTitle(), paper);
   }
 
   public void update() {
@@ -183,5 +185,9 @@ public class PaperStore {
 
   public ConcurrentHashMap<Integer, List<Paper>> getYearToPapers() {
     return yearToPapers;
-}
+  }
+
+  public ConcurrentHashMap<String, Paper> getTitleToPapers() {
+    return paperTitleToPaper;
+  }
 }
