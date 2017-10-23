@@ -167,8 +167,10 @@ public class LogicController {
 	  String title = "Low-density parity check codes over GF(q)";
 	  ConcurrentHashMap<String, List<Paper>> listInCitation = paperStore.getInCitations();
 	  ConcurrentHashMap<String, List<Paper>> listOutCitation = paperStore.getOutCitations();
-	  List<Paper> inList = listInCitation.get(title);
-	  List<Paper> outList = listOutCitation.get(title);
+	  ConcurrentHashMap<String, Paper> listPaper = paperStore.getTitleToPapers();
+	  Paper base = listPaper.get(title);
+	  List<Paper> inList = listInCitation.get(base.getId());
+	  List<Paper> outList = listOutCitation.get(base.getId());
 	  Boolean first = true;
 	  listVertex += "{\"id\": \""+title+"\", \"group\": "+0+"}";
 	  for (Paper p : inList){
