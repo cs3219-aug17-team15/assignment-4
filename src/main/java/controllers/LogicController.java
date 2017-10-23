@@ -51,8 +51,7 @@ public class LogicController {
 		  List<Author> author = p.getAuthors();
 		  for (Author a : author) {
 			  listAuthor.putIfAbsent(a.getName(), 0);
-			  int i = listAuthor.get(a.getName());
-			  i += 1;
+			  listAuthor.put(a.getName(), listAuthor.get(a.getName())+1);
 			  String temp = a.getName();
 			  for(int j = 0; j < 10; j++){
 				  if(max[j] == null || listAuthor.get(max[j]) < listAuthor.get(temp)){
@@ -90,8 +89,7 @@ public class LogicController {
 		  List<String> citation = p.getInCitations();
 		  for (String s : citation) {
 			  listCitation.putIfAbsent(s, 0);
-			  int i = listCitation.get(s);
-			  i += 1;
+			  listCitation.put(s, listCitation.get(s)+1);
 			  String temp = s;
 			  for(int j = 0; j < 5; j++){
 				  if(max[j] == null || listCitation.get(max[j]) < listCitation.get(temp)){
@@ -129,8 +127,7 @@ public class LogicController {
 	  for (Paper p : list){
 		  int year = p.getYear();
 		  listYear.putIfAbsent(year, 0);
-		  int i = listYear.get(year);
-		  i += 1;
+		  listYear.put(year, listYear.get(year)+1);
 		  if(year > largest){
 			  largest = year;
 		  }
@@ -221,8 +218,7 @@ public class LogicController {
 		  List<String> phrase = p.getKeyPhrases();
 		  for (String s : phrase) {
 			  listKeyPhrase.putIfAbsent(s, 0);
-			  int i = listKeyPhrase.get(s);
-			  i += 1;
+			  listKeyPhrase.put(s, listKeyPhrase.get(s)+1);
 			  String temp = s;
 			  for(int j = 0; j < 10; j++){
 				  if(max[j] == null || listKeyPhrase.get(max[j]) < listKeyPhrase.get(temp)){
