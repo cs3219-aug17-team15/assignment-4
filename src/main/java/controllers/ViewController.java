@@ -33,7 +33,14 @@ public class ViewController {
   };
 
   public static Route task3 = (Request req, Response resp) -> {
-    return "Hello World";
+    Map<String, Object> model = new HashMap<>();
+    model.put("taskTitle", "Task 3");
+    model.put("taskHeader", "Task 3: Trend of the amount of publications for venue 'ICSE'");
+    model.put("taskJs", "http://localhost:4567/task3.js");
+    model.put("taskCss", "http://localhost:4567/task3.css");
+    return new VelocityTemplateEngine().render(
+        new ModelAndView(model, "/velocity/layout.vm")
+    );
   };
 
   public static Route task4 = (Request req, Response resp) -> {

@@ -45,61 +45,6 @@ public class LogicController {
     }
     return logicController;
   }
-  
-  public String task1() {
-	  String result ="Task1:\n" ;
-	  ConcurrentHashMap<String, List<Paper>> listVenue = paperStore.getVenueToPapers();
-	  List<Paper> list = listVenue.get("arXiv");
-	  ConcurrentHashMap<String, Integer> listAuthor = new ConcurrentHashMap<String, Integer>();
-	  String max[] = new String[10];
-	  for (Paper p : list){
-		  List<Author> author = p.getAuthors();
-		  for (Author a : author) {
-			  listAuthor.putIfAbsent(a.getName(), 0);
-			  int i = listAuthor.get(a.getName());
-			  i += 1;
-			  String temp = a.getName();
-			  for(int j = 0; j < 10; j++){
-				  if(max[j] == null || listAuthor.get(max[j]) < listAuthor.get(temp)){
-					  String temp1 = max[j];
-					  max[j] = temp;
-					  temp = temp1;
-				  }
-			  }
-		  }
-	  }
-	  for (String s : max){
-		  result += s +","+listAuthor.get(s)+"\n";
-	  }
-	  return result;
-  }
-  public String task2() {
-	  String result ="Task2:\n" ;
-	  ConcurrentHashMap<String, List<Paper>> listVenue = paperStore.getVenueToPapers();
-	  List<Paper> list = listVenue.get("arXiv");
-	  ConcurrentHashMap<String, Integer> listCitation = new ConcurrentHashMap<String, Integer>();
-	  String max[] = new String[5];
-	  for (Paper p : list){
-		  List<String> citation = p.getInCitations();
-		  for (String s : citation) {
-			  listCitation.putIfAbsent(s, 0);
-			  int i = listCitation.get(s);
-			  i += 1;
-			  String temp = s;
-			  for(int j = 0; j < 5; j++){
-				  if(max[j] == null || listCitation.get(max[j]) < listCitation.get(temp)){
-					  String temp1 = max[j];
-					  max[j] = temp;
-					  temp = temp1;
-				  }
-			  }
-		  }
-	  }
-	  for (String s : max){
-		  result += s +","+listCitation.get(s)+"\n";
-	  }
-	  return result;
-  }
 
   public static Route task1JSON = (Request req, Response resp) -> {
     List<Paper> list = paperStore.getVenueToPapers().getOrDefault("ArXiv", new ArrayList<>());
@@ -138,35 +83,23 @@ public class LogicController {
         .collect(Collectors.toList()));
   };
 
-  public String task3() {
-    String result = "Task3:\n";
+  public static Route task3JSON = (Request req, Response resp) -> {
     ConcurrentHashMap<String, List<Paper>> listVenue = paperStore.getVenueToPapers();
     List<Paper> list = listVenue.get("ICSE");
     ConcurrentHashMap<Integer, Integer> listYear = new ConcurrentHashMap<Integer, Integer>();
-    int largest = Integer.MIN_VALUE;
-    int smallest = Integer.MAX_VALUE;
+    int year;
     for (Paper p : list) {
-      int year = p.getYear();
-      listYear.putIfAbsent(year, 0);
-      int i = listYear.get(year);
-      i += 1;
-      if (year > largest) {
-        largest = year;
-      }
-      if (year < smallest) {
-        smallest = year;
-      }
-    }
-    for (int i = smallest; i <= largest; i++) {
-      int count = listYear.get(i);
-      if (listYear.get(i) == null) {
-        result += i + "," + 0;
+      year = p.getYear();
+      if (listYear.containsKey(year)) {
+        listYear.put(year, listYear.get(year) + 1);
       } else {
-        result += i + "," + count;
+        listYear.put(year, 1);
       }
     }
-    return result;
-  }
+    return gson.toJson(listYear.entrySet().stream()
+        .map(entry -> new NameCount(Integer.toString(entry.getKey()), entry.getValue()))
+        .collect(Collectors.toList()));
+  };
 
   public String task4() {
     String result = "Task4:\n";

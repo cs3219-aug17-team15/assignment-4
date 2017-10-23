@@ -32,7 +32,7 @@ d3.json("http://localhost:4567/api/task2", function(error, data) {
       .attr("y", 6)
       .attr("dy", "0.71em")
       .attr("text-anchor", "end")
-      .text("Frequency");
+      .text("Count");
 
   g.selectAll(".bar")
     .data(data)

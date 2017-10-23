@@ -33,6 +33,7 @@ public class Router {
     path("/api", () -> {
       get("/task1", LogicController.task1JSON);
       get("/task2", LogicController.task2JSON);
+      get("/task3", LogicController.task3JSON);
     });
 
     System.out.println(ROUTER_STARTED);

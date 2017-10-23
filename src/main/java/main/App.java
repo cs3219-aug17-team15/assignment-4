@@ -8,7 +8,7 @@ public class App {
     Router router = new Router();
     router.initAndServe();
 
-	LogicController logic = LogicController.getInstance();
+//	LogicController logic = LogicController.getInstance();
 ////	System.out.print(logic.task1());
 //	System.out.print(logic.task2());
 //	System.out.print(logic.task3());
