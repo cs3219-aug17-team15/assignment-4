@@ -44,7 +44,14 @@ public class ViewController {
   };
 
   public static Route task4 = (Request req, Response resp) -> {
-    return "Hello World";
+    Map<String, Object> model = new HashMap<>();
+    model.put("taskTitle", "Task 4");
+    model.put("taskHeader", "Task 4: Citation web for paper with title 'Low-density parity check codes over GF(q)'");
+    model.put("taskJs", "http://localhost:4567/task4.js");
+    model.put("taskCss", "http://localhost:4567/task4.css");
+    return new VelocityTemplateEngine().render(
+        new ModelAndView(model, "/velocity/layout.vm")
+    );
   };
 
   public static Route task5 = (Request req, Response resp) -> {

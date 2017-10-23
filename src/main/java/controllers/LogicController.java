@@ -113,35 +113,35 @@ public class LogicController {
     ConcurrentHashMap<String, List<Paper>> listOutCitation = paperStore.getOutCitations();
     ConcurrentHashMap<String, Paper> listPaper = paperStore.getTitleToPapers();
     Paper base = listPaper.get(title);
-    List<Paper> inList = listInCitation.get(base.getId());
-    List<Paper> outList = listOutCitation.get(base.getId());
+    List<Paper> inList = listInCitation.getOrDefault(base.getId(), new ArrayList<>());
+    List<Paper> outList = listOutCitation.getOrDefault(base.getId(), new ArrayList<>());
     Boolean first = true;
     listVertex += "{\"id\": \"" + title + "\", \"group\": " + 0 + "}";
     for (Paper p : inList) {
-      listVertex += ",\n{\"id\": \"" + p.getTitle() + "\", \"group\": " + 1 + "}";
+      listVertex += ",\n{\"id\": \"" + p.getId() + "\", \"group\": " + 1 + "}";
       if (first) {
         listEdge +=
-            "{\"source\": \"" + p.getTitle() + "\", \"target\": \"" + title + "\", \"value\": 1}";
+            "{\"source\": \"" + p.getId() + "\", \"target\": \"" + title + "\", \"value\": 1}";
         first = false;
       } else {
-        listEdge += ",\n{\"source\": \"" + p.getTitle() + "\", \"target\": \"" + title
+        listEdge += ",\n{\"source\": \"" + p.getId() + "\", \"target\": \"" + title
             + "\", \"value\": 1}";
       }
       List<Paper> list = listInCitation.getOrDefault(p.getId(),new ArrayList<>());
       for (Paper t : list) {
-        listVertex += ",\n{\"id\": \"" + t.getTitle() + "\", \"group\": " + 3 + "}";
-        listEdge += ",\n{\"source\": \"" + t.getTitle() + "\", \"target\": \"" + p.getTitle()
+        listVertex += ",\n{\"id\": \"" + t.getId() + "\", \"group\": " + 3 + "}";
+        listEdge += ",\n{\"source\": \"" + t.getId() + "\", \"target\": \"" + p.getId()
             + "\", \"value\": 1}";
       }
     }
     for (Paper p : outList) {
-      listVertex += ",\n{\"id\": \"" + p.getTitle() + "\", \"group\": " + 2 + "}";
+      listVertex += ",\n{\"id\": \"" + p.getId() + "\", \"group\": " + 2 + "}";
       listEdge +=
-          ",\n{\"source\": \"" + title + "\", \"target\": \"" + p.getTitle() + "\", \"value\": 1}";
+          ",\n{\"source\": \"" + title + "\", \"target\": \"" + p.getId() + "\", \"value\": 1}";
       List<Paper> list = listOutCitation.getOrDefault(p.getId(),new ArrayList<>());
       for (Paper t : list) {
-        listVertex += ",\n{\"id\": \"" + t.getTitle() + "\", \"group\": " + 4 + "}";
-        listEdge += ",\n{\"source\": \"" + p.getTitle() + "\", \"target\": \"" + t.getTitle()
+        listVertex += ",\n{\"id\": \"" + t.getId() + "\", \"group\": " + 4 + "}";
+        listEdge += ",\n{\"source\": \"" + p.getId() + "\", \"target\": \"" + t.getId()
             + "\", \"value\": 1}";
       }
     }
@@ -160,6 +160,36 @@ public class LogicController {
     }
     return result;
   }
+
+  public static Route task4JSON = (Request req, Response resp) -> {
+    String title = "Low-density parity check codes over GF(q)";
+    ConcurrentHashMap<String, Paper> listPaper = paperStore.getPapers();
+
+    List<Task4Node> vertices = new ArrayList<>();
+    List<Task4Link> edges = new ArrayList<>();
+
+    Paper base = paperStore.getTitleToPapers().get(title);
+    vertices.add(new Task4Node(base, 0));
+    Paper linkedPaper, secLinkedPaper;
+    for (String baseIn : base.getInCitations()) {
+      linkedPaper = listPaper.get(baseIn);
+      if (linkedPaper == null) {
+        continue;
+      }
+      vertices.add(new Task4Node(linkedPaper, 1));
+      edges.add(new Task4Link(linkedPaper.getId(), base.getId(), 1));
+      for (String secIn : linkedPaper.getInCitations()) {
+        secLinkedPaper = listPaper.get(secIn);
+        if (secLinkedPaper == null) {
+          continue;
+        }
+        vertices.add(new Task4Node(secLinkedPaper, 2));
+        edges.add(new Task4Link(secLinkedPaper.getId(), linkedPaper.getId(), 2));
+      }
+    }
+
+    return gson.toJson(new Task4Data(vertices, edges));
+  };
 
   public static Route task5JSON = (Request req, Response resp) -> {
     ConcurrentHashMap<String, List<Paper>> listVenue = paperStore.getVenueToPapers();
@@ -214,4 +244,48 @@ public class LogicController {
       this.name = name;
     }
   }
+
+  @SuppressWarnings(value = {"unused"})
+  private static class Task4Data {
+    private List<Task4Link> links;
+    private List<Task4Node> nodes;
+
+    public Task4Data(List<Task4Node> nodes, List<Task4Link> links) {
+      this.links = links;
+      this.nodes = nodes;
+    }
+  }
+
+  @SuppressWarnings(value = {"unused"})
+  private static class Task4Node {
+    String id;
+    String title;
+    String venue;
+    List<Author> authors;
+    int group;
+    int year;
+
+    public Task4Node(Paper p, int group) {
+      this.id = p.getId();
+      this.title = p.getTitle();
+      this.authors = p.getAuthors();
+      this.venue = p.getVenue();
+      this.year = p.getYear();
+      this.group = group;
+    }
+  }
+
+  @SuppressWarnings(value = {"unused"})
+  private static class Task4Link {
+    String source;
+    String target;
+    int value;
+
+    public Task4Link(String sourceId, String targetId, int value) {
+      this.source = sourceId;
+      this.target = targetId;
+      this.value = value;
+    }
+  }
+
 }

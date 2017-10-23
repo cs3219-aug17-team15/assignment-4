@@ -34,6 +34,7 @@ public class Router {
       get("/task1", LogicController.task1JSON);
       get("/task2", LogicController.task2JSON);
       get("/task3", LogicController.task3JSON);
+      get("/task4", LogicController.task4JSON);
       get("/task5", LogicController.task5JSON);
     });
 
